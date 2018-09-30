@@ -25,7 +25,9 @@ def rejection_sampler(density_fnc, sampler_fnc, k=None, n_iterations=10000):
     ??? Is it possible to continually change the k value as you find larger values from the target density function? or would that have to be done for the final time?
     how will changing the k in the middle of the function run affect the outcome?
     the goal is to find random samples and reject all the samples that aren't within our target density, but if the k is too low then moving it up just above the new highest
-    point would help towards that goal without messing up the outcome. the outcome I want is a vector of valid samples, so ensuring I get that on both sides should be fine
+    point would help towards that goal without messing up the outcome. the outcome I want is a vector of valid samples, so ensuring I get that on both sides should be fine.
+    it only matters if a sample is rejected or not rejected, not by how much the fitting random distribution was off from the target density function, k only needs to keep track
+    of the largest possible value and be just above that.
     """
     # return valid_samples, sample_density
 
