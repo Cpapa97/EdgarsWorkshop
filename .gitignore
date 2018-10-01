@@ -1,2 +1,5 @@
 # Allow the python environment path/type to be altered per repo clone
+# Also might as well remove all .vscode downloads
+.vscode
+.vscode/launch.json
 .vscode/settings.json
