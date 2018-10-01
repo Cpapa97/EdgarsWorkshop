@@ -1,1 +1,2 @@
+# Ensure per user settings don't get tracked by git (e.g. path to python environment that's unique to each user/computer/account)
 .vscode/
