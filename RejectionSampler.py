@@ -1,12 +1,20 @@
 import numpy as np
+import random
+import matplotlib.pyplot as mpl
 
-def target_density_function(x):
+def uniform(a, b):
+    return random.uniform(a, b)
 
+def gaussian(x, mu, sigma):
+    return (1 / (np.sqrt(2 * np.pi * sigma * sigma))) * np.exp(-1 * (((x - mu)**2) / (2 * sigma * sigma)))
+
+def target_density_function(x): # this doesn't need to integrate to less than one because rejection sampling can ignore the normalization constant, but doesn't it need to converge still?
+    
     y = np.log(x) + 1/x**2
 
     return y
 
-def sampler_function(n_samples_needed, n_iterations): # I need to figure out how this manual documentation syntax works
+def sampler_function(n_samples_needed, n_iterations, distribution=uniform): # I need to figure out how this manual documentation syntax works
     """
     n_samples_needed (int): number of samples to be generated, if the number isn't reached it'll add to the amount of iterations, and if it reaches that amount early it'll stop early.
 
@@ -14,11 +22,12 @@ def sampler_function(n_samples_needed, n_iterations): # I need to figure out how
 
     returns: vector of samples ( and maybe sample density), number of actual iterations (int)
     """
-    raise NotImplementedError
-
+    valid_samples = np.array([0, 1, 2])
+    
+    return valid_samples
     
 
-def rejection_sampler(density_fnc, sampler_fnc, k=None, n_iterations=10000):
+def rejection_sampler(density_fnc, sampler_fnc, k=None, n_iterations=10000, sample_distribution=uniform): # I could just pass in the distribution functions themselves
     """
     if k not defined, calculate it automatically,
     k also has to be at least greater than the largest value you can get from your target density function
@@ -29,9 +38,16 @@ def rejection_sampler(density_fnc, sampler_fnc, k=None, n_iterations=10000):
     it only matters if a sample is rejected or not rejected, not by how much the fitting random distribution was off from the target density function, k only needs to keep track
     of the largest possible value and be just above that.
     """
+
+    # need to implement distribution I know, uniform or gaussian for example
+
+    valid_samples = sampler_fnc(1000, n_iterations, sample_distribution)
+
+    # generate the sample density from the valid samples vs ...?
+
     # return valid_samples, sample_density
 
-    raise NotImplementedError
+    return valid_samples, [0, 0.3, 0.7]
 
 for i in range(1, 100):
     output = target_density_function(i)
