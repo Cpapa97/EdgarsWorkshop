@@ -1,14 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# use np.ra
-
-# def uniform(a, b):
-#     return random.uniform(a, b)
-
-# def gaussian(x, mu, sigma): # I NEED TO PASS THIS IN ANOTHER WAY, so that the implementation of any distribution is the same
-#     return (1 / (np.sqrt(2 * np.pi * sigma * sigma))) * np.exp(-1 * (((x - mu)**2) / (2 * sigma * sigma)))
-
 def target_density_function(x): # this doesn't need to integrate to less than one because rejection sampling can ignore the normalization constant, but doesn't it need to converge still?
     """
 
@@ -19,7 +11,7 @@ def target_density_function(x): # this doesn't need to integrate to less than on
     return y
 
 # Could use a decorator pattern to send in the proper distribution and still do the proper work beforehand that's relevant to it
-def sampler_function(n_samples, sample_distribution='uniform', a=0, b=1): # I need to figure out how this manual documentation syntax works
+def sampler_function(n_samples, sample_distribution='uniform', a=0, b=1):
     """
     n_samples (int): number of samples to be generated, if the number isn't reached it'll add to the amount of iterations, and if it reaches that amount early it'll stop early.
 
@@ -45,27 +37,33 @@ def sampler_function(n_samples, sample_distribution='uniform', a=0, b=1): # I ne
 
     return samples, probability
     
-# pass in sampler_fnc as the sampler function but with the distribution and probability descriptor passed through as decorators on sampler function
-def rejection_sampler(density_fnc, sampler_fnc, k=None, n_iterations=10000): # I could just pass in the distribution functions themselves
+def rejection_sampler(density_fnc, sampler_fnc, k=None, n_iterations=10000):
     samp, prob = sampler_fnc(n_iterations, sample_distribution='gaussian', a=0, b=1)
 
-    k = 2
-
+    k = 1.1
+    
+    # Not sure if this is what I need to do
+    
     target_probabilities = target_density_function(samp)
 
-    
+    valid_samples = []
+    for from_dist, fy, gy in zip(samp, target_probabilities, prob):
+        print(fy, fy / (k * gy), fy < fy / (k * gy))
 
-    return samp, prob
-    # generate the sample density from the valid samples vs ...?
+        # Not sure what to check against when determining when to accept/reject
+        if fy < fy / (k * gy):
+            valid_samples.append(from_dist)
+
+    print(len(samp), len(valid_samples))
+
+    return valid_samples, samp
 
     # return valid_samples, sample_density
-
-    return valid_samples, [0, 0.3, 0.7]
 
 # valid_samples, density_of_samples = rejection_sampler(target_density_function, sampler_function)
 # print(len(valid_samples))
 
-samp, prob = rejection_sampler(target_density_function, sampler_function, n_iterations=1000000)
+valid_samples, all_samp = rejection_sampler(target_density_function, sampler_function, n_iterations=10)#00000)
 
 x = np.linspace(0, 1, 100)
 
@@ -73,18 +71,12 @@ plt.plot(x, np.sin(x)**2, label='sine')
 
 plt.xlabel('x label')
 plt.ylabel('y label')
-plt.hist(samp, bins=50)
+plt.hist(valid_samples, bins=50)
 plt.title("Simple Plot")
 
 plt.legend()
 
 plt.show()
-
-# for i in range(1, 100):
-#     output = target_density_function(i)
-#     print(output)
-
-# valid_samples, sample_density = rejection_sampler(target_density_function, sampler_function)
 
 # plot histogram of the generated samples, compare that against target density function
 
