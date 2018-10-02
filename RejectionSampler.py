@@ -1,5 +1,5 @@
 import numpy as np
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 def target_density_function(x): # this doesn't need to integrate to less than one because rejection sampling can ignore the normalization constant, but doesn't it need to converge still?
     
@@ -19,9 +19,8 @@ def sampler_function(n_samples, sample_distribution='uniform', a=0, b=1):
     returns: vector of samples ( and maybe sample density), number of actual iterations (int)
     """
     if sample_distribution == 'uniform':
-        bins = n_samples / 10
         samples = np.random.uniform(a, b, n_samples)
-        probability = 1 / bins * np.ones(n_samples)
+        probability = 1 / (b - a) * np.ones(n_samples)
         
     elif sample_distribution == 'gaussian':
         samples = np.random.normal(a, b, n_samples)
@@ -35,27 +34,22 @@ def sampler_function(n_samples, sample_distribution='uniform', a=0, b=1):
 def rejection_sampler(density_fnc, sampler_fnc, k=None, n_iterations=10000):
     samp, prob = sampler_fnc(n_iterations, sample_distribution='gaussian', a=0, b=1)
 
-    k = 1.1 # will eventually compute based on largest value automatically
-    
-    target_probabilities = target_density_function(samp)
+    target_prob = target_density_function(samp)
 
     samples_u = np.random.rand(n_iterations) # get samples from uniform
 
-    check_acceptance = target_probabilities / (k * prob) # need a better name
+    k = (target_prob / samp).max()
 
-    valid_sample_indices = np.where(samples_u < check_acceptance)[0]
-    valid_samples = samp[valid_sample_indices]
-
-    print(valid_samples)
+    valid_samples = samp[samples_u < target_prob / (k * prob)]
 
     print(len(samp), len(valid_samples))
 
-    sample_density = None # Need to still figure this out
+    rejection_ratio = 1 - len(valid_samples) / n_iterations
 
-    return valid_samples, sample_density
+    return valid_samples, rejection_ratio
 
-valid_samples, _ = rejection_sampler(target_density_function, sampler_function, n_iterations=100)#0000)
-'''
+valid_samples, rejection_ratio = rejection_sampler(target_density_function, sampler_function, n_iterations=1000000)
+
 x = np.linspace(0, 1, 100)
 
 plt.plot(x, np.sin(x)**2, label='sine')
@@ -68,7 +62,7 @@ plt.title("Simple Plot")
 plt.legend()
 
 plt.show()
-'''
+
 # plot histogram of the generated samples, compare that against target density function
 
 # plot proportion of rejection as a bar graph (valid samples / n_iterations)
