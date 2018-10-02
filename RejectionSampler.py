@@ -31,20 +31,20 @@ def sampler_function(n_samples, sample_distribution='uniform', a=0, b=1):
 
     return samples, probability
     
-def rejection_sampler(density_fnc, sampler_fnc, k=None, n_iterations=10000):
-    samp, prob = sampler_fnc(n_iterations, sample_distribution='gaussian', a=0, b=1)
+def rejection_sampler(target, sampler, k=None, n_iterations=10000):
+    samples, sample_prob = sampler(n_iterations, sample_distribution='uniform', a=0, b=10) # need to pass these arguments in as a wrapper fnc
 
-    target_prob = target_density_function(samp)
+    target_prob = target(samples)
 
-    samples_u = np.random.rand(n_iterations) # get samples from uniform
+    k = (target_prob / samples).max()
 
-    k = (target_prob / samp).max()
+    valid_samples = samples[np.random.rand(n_iterations) < target_prob / (k * sample_prob)] # Check against the uniform dist from (0, 1)
 
-    valid_samples = samp[samples_u < target_prob / (k * prob)]
-
-    print(len(samp), len(valid_samples))
+    print(len(sample_prob), len(valid_samples))
 
     rejection_ratio = 1 - len(valid_samples) / n_iterations
+
+    print(rejection_ratio)
 
     return valid_samples, rejection_ratio
 
