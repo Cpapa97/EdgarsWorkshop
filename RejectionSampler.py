@@ -32,11 +32,11 @@ def sampler_function(n_samples, sample_distribution='uniform', a=0, b=1):
     return samples, probability
     
 def rejection_sampler(target, sampler, k=None, n_iterations=10000):
-    samples, sample_prob = sampler(n_iterations, sample_distribution='uniform', a=0, b=10) # need to pass these arguments in as a wrapper fnc
+    samples, sample_prob = sampler(n_iterations, sample_distribution='uniform', a=0, b=(np.pi * 3)) # need to pass these arguments in as a wrapper fnc
 
     target_prob = target(samples)
 
-    k = (target_prob / samples).max()
+    k = (target_prob / sample_prob).max()
 
     valid_samples = samples[np.random.rand(n_iterations) < target_prob / (k * sample_prob)] # Check against the uniform dist from (0, 1)
 
@@ -50,13 +50,13 @@ def rejection_sampler(target, sampler, k=None, n_iterations=10000):
 
 valid_samples, rejection_ratio = rejection_sampler(target_density_function, sampler_function, n_iterations=1000000)
 
-x = np.linspace(0, 1, 100)
+x = np.linspace(0, np.pi * 3, 100)
 
 plt.plot(x, np.sin(x)**2, label='sine')
 
 plt.xlabel('x label')
 plt.ylabel('y label')
-plt.hist(valid_samples, bins=50)
+plt.hist(valid_samples, bins=100)
 plt.title("Simple Plot")
 
 plt.legend()
