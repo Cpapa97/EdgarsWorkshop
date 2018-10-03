@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def target_density_function(x): # this doesn't need to integrate to less than one because rejection sampling can ignore the normalization constant, but doesn't it need to converge still?
-    
-    return np.sin(x)**2
+    a, b = (0, 0.5)
+    return (1 / (np.sqrt(2 * np.pi * b * b))) * np.exp(-1 * (((x - a)**2) / (2 * b * b))) #np.cos(x)**2 #np.sin(x)**2
 
 # Could use a decorator pattern to send in the proper distribution and still do the proper work beforehand that's relevant to it
 def sampler_function(n_samples, sample_distribution='uniform', a=0, b=1):
@@ -32,7 +32,7 @@ def sampler_function(n_samples, sample_distribution='uniform', a=0, b=1):
     return samples, probability
     
 def rejection_sampler(target, sampler, k=None, n_iterations=10000):
-    samples, sample_prob = sampler(n_iterations, sample_distribution='uniform', a=0, b=(np.pi * 3)) # need to pass these arguments in as a wrapper fnc
+    samples, sample_prob = sampler(n_iterations, sample_distribution='gaussian', a=0, b=1)#b=(np.pi * 3)) # need to pass these arguments in as a wrapper fnc
 
     target_prob = target(samples)
 
